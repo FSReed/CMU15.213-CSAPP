@@ -154,9 +154,8 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-
-  return 2;
-
+    int biggest_positive = 1 << 0x1f;
+    return ~biggest_positive + 1;
 }
 //2
 /*
