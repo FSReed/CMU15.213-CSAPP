@@ -234,7 +234,13 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+	int xPos = !(x >> 31);
+	int yPos = !(y >> 31);
+	int sameBit = !(xPos ^ yPos);
+	int cond = (!xPos) & yPos;
+	int result = x + ~y + 1;
+	int resultPos = !(result >> 31);
+	return cond | (sameBit & !result) | (sameBit & !resultPos);
 }
 //4
 /* 
