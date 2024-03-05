@@ -165,8 +165,12 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-    int biggest = ~(1 << 0x1f);
-    return !(x ^ biggest);
+    int i = x + 1;	// This is quite important! Can't do x + x!
+    x = x + i;		// Now for x = max, there won't be an overflow.
+    x = ~x;		// If original x = max, now x would be all 1.
+    i = !i;		// Important! If original x = -1, same result.
+    x = x + i;		// If original i = 0, then x would be 1.
+    return !x;
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
