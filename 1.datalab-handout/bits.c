@@ -181,7 +181,10 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+    int odd = 0xAA + (0xAA << 8);
+    odd = odd + (odd << 16);
+    x = x & odd;
+    return !(x ^ odd);	// Use XOR to determine whether two numbers are equal.
 }
 /* 
  * negate - return -x 
@@ -191,7 +194,7 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+    return (~x + 1);
 }
 //3
 /* 
@@ -204,7 +207,11 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+	int left = x + ~0x30 + 1;
+	int right = x + ~0x3a + 1;
+	left = !(left >> 31);
+	right = !!(right >> 31);
+	return left & right;
 }
 /* 
  * conditional - same as x ? y : z 
