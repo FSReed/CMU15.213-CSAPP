@@ -273,7 +273,36 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+	int neg, mask, high, highLabel, baseOne, baseTwo, baseThree, baseFour;
+	int tmp = ~x + 1;
+	neg = ~((x >> 31) & 1) + 1;
+	x = (neg & tmp) + (~neg & x);
+	mask = 0xff + (0xff >> 8);
+	high = !!((x >> 16) & mask);
+	highLabel = ~high + 1;
+	baseOne = 0x10 & highLabel;
+	x = x >> baseOne;
+	printf("%x\n", baseOne);
+	
+	mask = 0xff;
+	high = !!((x >> 8) & mask);
+	highLabel = ~high + 1;
+	baseTwo = 0x8 & highLabel;
+	x = x >> baseTwo;
+
+	mask = 0xf;
+	high = !!((x >> 4) & mask);
+	highLabel = ~high + 1;
+	baseThree = 0x4 & highLabel;
+	x = x >> baseThree;
+
+	mask = 0x3;
+	high = !!((x >> 2) & mask);
+	highLabel = ~high + 1;
+	baseFour = 0x2 & highLabel;
+	x = x >> baseFour;
+
+	return baseOne + baseTwo + baseThree + baseFour;	
 }
 //float
 /* 
