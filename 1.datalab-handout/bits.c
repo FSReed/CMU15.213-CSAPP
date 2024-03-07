@@ -273,7 +273,7 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-	int neg, mask, high, highLabel, baseOne, baseTwo, baseThree, baseFour, baseFive;
+	int neg, mask, high, highLabel, baseOne, baseTwo, baseThree, baseFour, baseFive, result, minimum;
 	int tmp = ~x + 1;
 	neg = ~((x >> 31) & 1) + 1;
 	x = (neg & tmp) + (~neg & x);
@@ -305,8 +305,12 @@ int howManyBits(int x) {
 	high = !!((x >> 1) & mask);
 	highLabel = ~high + 1;
 	baseFive = 0x1 & highLabel;
-
-	return baseOne + baseTwo + baseThree + baseFour + baseFive + 1;	
+	
+	result = baseOne + baseTwo + baseThree + baseFour + baseFive; 
+	// If result = 31, meaning it's the minimum one. We won't add one.
+	minimum = !(result ^ 0x1f);
+	minimum = ~minimum + 1;
+	return result + minimum + 2;
 }
 //float
 /* 
