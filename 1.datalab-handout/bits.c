@@ -273,10 +273,13 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-	int neg, mask, high, highLabel, baseOne, baseTwo, baseThree, baseFour, baseFive, result, minimum;
-	int tmp = ~x + 1;
-	neg = ~((x >> 31) & 1) + 1;
+	int origin, neg, mask, high, highLabel, baseOne, baseTwo, baseThree, baseFour, baseFive, result, minimum, zero, edge;
+	// int tmp = ~x + 1;
+	int tmp = ~x;		// Misunderstood here. Negarive numbers only need its highest 0 bit, not it's absolute value's highest 1 bit. 
+	// neg = ~((x >> 31) & 1) + 1;	// Redundant
+	neg = x >> 31;
 	x = (neg & tmp) + (~neg & x);
+	origin = x;
 	mask = 0xff + (0xff << 8);
 	high = !!((x >> 16) & mask);
 	highLabel = ~high + 1;
@@ -309,8 +312,10 @@ int howManyBits(int x) {
 	result = baseOne + baseTwo + baseThree + baseFour + baseFive; 
 	// If result = 31, meaning it's the minimum one. We won't add one.
 	minimum = !(result ^ 0x1f);
-	minimum = ~minimum + 1;
-	return result + minimum + 2;
+	zero = !origin;
+	edge = minimum | zero;
+	edge = ~edge + 1;
+	return result + edge + 2;
 }
 //float
 /* 
