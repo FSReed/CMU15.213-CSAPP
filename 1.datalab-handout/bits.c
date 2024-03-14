@@ -359,10 +359,10 @@ int floatFloat2Int(unsigned uf) {
 	int exponent = (uf >> 0x17) & 0xff;
 	int norm = 0xff + (0xff << 8) + (0x7f << 16);
 	int significant = uf & norm;
-	int E = exponent - 23;
 	int sign = (uf >> 31) & 0x1;
 	int result;
 	exponent -= 0x7f;		//BIASed version of exponent
+	int E = exponent - 0x17;
 	
 	if (exponent < 0) {
 		return 0;
