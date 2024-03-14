@@ -356,7 +356,22 @@ unsigned floatScale2(unsigned uf) {
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+	int exponent = (uf >> 0x17) & 0xff;
+	int norm = 0xff + (0xff << 8) + (0x7f << 16);
+	int significant = uf & norm;
+	int E = exponent - 23;
+	exponent -= 0x7f;		//BIASed version of exponent
+	
+	if (exponent < 0) {
+		return 0;
+	} else if (exponent > 31) {
+		return (0x1 << 0x1f);
+	} else {
+		if (E < 0) {
+			return (0x1 << exponent) + (significant >> (23 - exponent));
+		} else {
+			return (0x1 << exponent) + (significant << (exponent - 23));		}
+	}
 }
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
