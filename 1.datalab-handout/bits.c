@@ -330,7 +330,18 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned floatScale2(unsigned uf) {
-  return 2;
+	int exponent = (uf >> 0x17) & 0xff;
+	int sign = uf & (0x1 << 31);
+	int result;
+	if (exponent == 0) {
+		result = uf + uf + sign;
+	} else if (exponent == 0xff) {
+		return uf;
+	} else {
+		exponent = 0x1 << 23;
+		result = exponent + uf;
+	}
+	return result;
 }
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
