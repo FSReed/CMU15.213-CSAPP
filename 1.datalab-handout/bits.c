@@ -360,6 +360,8 @@ int floatFloat2Int(unsigned uf) {
 	int norm = 0xff + (0xff << 8) + (0x7f << 16);
 	int significant = uf & norm;
 	int E = exponent - 23;
+	int sign = (uf >> 31) & 0x1;
+	int result;
 	exponent -= 0x7f;		//BIASed version of exponent
 	
 	if (exponent < 0) {
@@ -368,9 +370,12 @@ int floatFloat2Int(unsigned uf) {
 		return (0x1 << 0x1f);
 	} else {
 		if (E < 0) {
-			return (0x1 << exponent) + (significant >> (23 - exponent));
+			result = (0x1 << exponent) + (significant >> (23 - exponent));
 		} else {
-			return (0x1 << exponent) + (significant << (exponent - 23));		}
+			result = (0x1 << exponent) + (significant << (exponent - 23));
+		}
+		if (sign) {result = ~result + 1;}
+		return result;
 	}
 }
 /* 
