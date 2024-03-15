@@ -361,8 +361,9 @@ int floatFloat2Int(unsigned uf) {
 	int significant = uf & norm;
 	int sign = (uf >> 31) & 0x1;
 	int result;
+	int E;
 	exponent -= 0x7f;		//BIASed version of exponent
-	int E = exponent - 0x17;
+	E = exponent - 0x17;
 	
 	if (exponent < 0) {
 		return 0;
@@ -392,5 +393,15 @@ int floatFloat2Int(unsigned uf) {
  *   Rating: 4
  */
 unsigned floatPower2(int x) {
-    return 2;
+	int sigBias;
+	if (x < -149) {return 0;}
+	if (x >= 128) {return (0xff << 0x17);}
+	if (x < -126) {
+		// Use significant part to represent
+		sigBias = x + 149;
+		return (0x1 << sigBias);
+	} else {
+		x = x + 127;
+		return (x << 0x17);
+	}
 }
