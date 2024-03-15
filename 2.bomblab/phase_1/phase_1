@@ -1,0 +1,26 @@
+GNU gdb (Ubuntu 12.1-0ubuntu1~22.04) 12.1
+Copyright (C) 2022 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<https://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./bomb...
+Dump of assembler code for function phase_1:
+   0x0000000000400ee0 <+0>:	sub    $0x8,%rsp
+   0x0000000000400ee4 <+4>:	mov    $0x402400,%esi
+   0x0000000000400ee9 <+9>:	call   0x401338 <strings_not_equal>
+   0x0000000000400eee <+14>:	test   %eax,%eax
+   0x0000000000400ef0 <+16>:	je     0x400ef7 <phase_1+23>
+   0x0000000000400ef2 <+18>:	call   0x40143a <explode_bomb>
+   0x0000000000400ef7 <+23>:	add    $0x8,%rsp
+   0x0000000000400efb <+27>:	ret    
+End of assembler dump.
