@@ -26,3 +26,9 @@ In `bash`, we can run programs with `LD_PRELOAD` defined as custom dynamic libra
 LD_PRELOAD="./mymalloc_runtime.so" /usr/bin/uptime
 ```
 
+## Tools for Manipulating Object Files
+
+- In GNU `binutil` package:
+  `ar`, `strings`, `strip`, `nm`, `size`, **`readelf` and `objdump`**.
+- Linux also provides `ldd` for manipulating shared libraries. `ldd` will list the shared libraries that an executable needs at run time.
+
