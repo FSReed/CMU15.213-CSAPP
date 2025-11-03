@@ -33,7 +33,7 @@ int open_clientfd(char *hostname, char *port) {
 int open_listenfd(char *port) {
   struct addrinfo hints;
   struct addrinfo *result, *p;
-  int listenfd, err_code;
+  int listenfd, err_code, optval = 1;
 
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
@@ -49,6 +49,10 @@ int open_listenfd(char *port) {
     listenfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
     if (listenfd < 0) {
       continue;
+    }
+    if (setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) < 0) {
+      fprintf(stderr, "setsockopt failed\n");
+      return -1;
     }
     if (bind(listenfd, p->ai_addr, p->ai_addrlen) == 0) {
       break;
