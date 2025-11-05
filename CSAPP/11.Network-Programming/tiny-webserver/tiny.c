@@ -158,10 +158,16 @@ void serve_static(int connfd, char *filename, int filesz) {
   rio_writen(connfd, buf, strlen(buf));
 
   int filefd = open(filename, O_RDONLY, 0);
-  char *filep = mmap(0, filesz, PROT_READ, MAP_PRIVATE, filefd, 0);
+  /* char *filep = mmap(0, filesz, PROT_READ, MAP_PRIVATE, filefd, 0); */
+  /* close(filefd); */
+  /* rio_writen(connfd, filep, filesz); */
+  /* munmap(filep, filesz); */
+
+  /* Homework 11.9 */
+  char *memfile = (char *)malloc(filesz);
+  rio_readn(filefd, memfile, filesz);
+  rio_writen(connfd, memfile, filesz);
   close(filefd);
-  rio_writen(connfd, filep, filesz);
-  munmap(filep, filesz);
 }
 
 /* a simple adder */
@@ -197,6 +203,9 @@ void getfiletype(char *filename, char *filetype) {
     strcpy(filetype, "image/png");
   else if (strstr(filename, ".jpg"))
     strcpy(filetype, "image/jpeg");
+  /* Homework 11.7 */
+  else if (strstr(filename, ".mp4"))
+    strcpy(filetype, "video/mpeg4");
   else
     strcpy(filetype, "text/plain");
 }
