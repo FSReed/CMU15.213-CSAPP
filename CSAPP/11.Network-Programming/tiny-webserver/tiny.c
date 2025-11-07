@@ -11,6 +11,7 @@
 void doit(int connfd);
 void clienterror(int connfd, char *cause, char *errnum, char *shortmsg, char *longmsg);
 void read_requesthdrs(rio_t *rio);
+void read_postargs(rio_t *rio, char *cgi_args);
 int parse_uri(char *uri, char *filename, char *cgi_args);
 void serve_static(int connfd, char *filename, int filesz, int content);
 void serve_dynamic(int connfd, char *filename, char *cgi_args);
@@ -19,6 +20,7 @@ void getfiletype(char *filename, char *filetype);
 enum SERVICE_TYPE {
   GET = 0,
   HEAD,
+  POST,
 };
 
 int main(int argc, char *argv[]) {
@@ -69,6 +71,8 @@ void doit(int connfd) {
     service_type = GET;
   } else if (strcasecmp(method, "HEAD") == 0) {
     service_type = HEAD;
+  } else if (strcasecmp(method, "POST") == 0) {
+    service_type = POST;
   } else {
     clienterror(connfd, method, "503", "Not implemented",
                 "Un-supported method");
@@ -92,6 +96,10 @@ void doit(int connfd) {
         serve_dynamic(connfd, filename, cgi_args);
       }
       break;
+    case POST:
+      read_postargs(&rio, cgi_args);
+      printf("POST: File: %s; args: %s\n", filename, cgi_args);
+      serve_dynamic(connfd, filename, cgi_args);
   }
   return;
 }
@@ -124,6 +132,23 @@ void clienterror(int connfd, char *cause, char *errnum, char *shortmsg, char *lo
 }
 
 void read_requesthdrs(rio_t *rio) {}
+
+void read_postargs(rio_t *rio, char *cgi_args) {
+  int n, arg_length;
+  char buf[MAXLINE];
+
+  while ((n = rio_readlineb(rio, buf, MAXLINE)) != 0) {
+    if (strcmp(buf, "\r\n") == 0) {
+      break;
+    }
+    if (strncmp(buf, "Content-Length", strlen("Content-Length")) == 0) {
+      sscanf(buf, "Content-Length: %d\r\n", &arg_length);
+      printf("Arg length: %d\n", arg_length);
+    }
+  }
+  // Only one line of the input
+  rio_readnb(rio, cgi_args, arg_length);
+}
 
 /* parse the uri */
 int parse_uri(char *uri, char *filename, char *cgi_args) {
