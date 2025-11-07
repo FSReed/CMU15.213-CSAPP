@@ -1,0 +1,36 @@
+h1 {
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
+}
+
+p {
+  text-align: left;
+}
+
+div {
+  width:100%;
+  overflow:auto;
+}
+
+div div {
+  float:left;
+  width:50%;
+  box-sizing: border-box;
+  padding-right: 10px;
+}
+
+img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+iframe {
+  float: left;
+  width: 50%;
+  box-sizing: border-box;
+  padding-left: 10px;
+}

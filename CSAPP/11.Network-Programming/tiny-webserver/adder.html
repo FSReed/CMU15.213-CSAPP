@@ -3,14 +3,30 @@
   <head>
     <meta charset="utf-8" />
     <title>Tiny Server</title>
+    <link rel="stylesheet" href="./style.css">
   </head>
   <body>
-    <form action="/cgi-bin" method = "GET">
-      <label for="1num">First number:</label><br>
-      <input id="1num" type="text" name="first" /><br>
-      <label for="2num">Second number:</label><br>
-      <input id="2num" type="text" name="second" /><br>
-      <input type="submit" text="Submit Query"/>
-    </form>
+    <div>
+      <div>
+        <p>Using GET:</p><br>
+        <form action="/cgi-bin" method = "GET">
+          <label for="1num">First number:</label><br>
+          <input id="1num" type="text" name="first" /><br>
+          <label for="2num">Second number:</label><br>
+          <input id="2num" type="text" name="second" /><br>
+          <input type="submit" value="Submit using GET"/>
+        </form>
+      </div>
+      <div>
+        <p>Using POST:</p><br>
+        <form action="/cgi-bin" method = "POST">
+          <label for="1num">First number:</label><br>
+          <input id="1num" type="text" name="first" /><br>
+          <label for="2num">Second number:</label><br>
+          <input id="2num" type="text" name="second" /><br>
+          <input type="submit" value="Submit using POST"/>
+        </form>
+      </div>
+    </div>
   </body>
 </html>
