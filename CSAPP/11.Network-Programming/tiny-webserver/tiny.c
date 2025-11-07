@@ -12,9 +12,14 @@ void doit(int connfd);
 void clienterror(int connfd, char *cause, char *errnum, char *shortmsg, char *longmsg);
 void read_requesthdrs(rio_t *rio);
 int parse_uri(char *uri, char *filename, char *cgi_args);
-void serve_static(int connfd, char *filename, int filesz);
+void serve_static(int connfd, char *filename, int filesz, int content);
 void serve_dynamic(int connfd, char *filename, char *cgi_args);
 void getfiletype(char *filename, char *filetype);
+
+enum SERVICE_TYPE {
+  GET = 0,
+  HEAD,
+};
 
 int main(int argc, char *argv[]) {
   int listenfd, connfd, n;
@@ -53,14 +58,20 @@ void doit(int connfd) {
   char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
   char filename[MAXLINE], cgi_args[MAXLINE];
   struct stat sbuf;
+  int service_type;
 
   rio_readinitb(&rio, connfd);
   rio_readlineb(&rio, buf, MAXLINE);
   printf("Request headers: \n");
   printf("%s", buf);
   sscanf(buf, "%s %s %s", method, uri, version);
-  if (strcasecmp(method, "GET") != 0) {
-    clienterror(connfd, method, "503", "Not implemented", "Un-supported method");
+  if (strcasecmp(method, "GET") == 0) {
+    service_type = GET;
+  } else if (strcasecmp(method, "HEAD") == 0) {
+    service_type = HEAD;
+  } else {
+    clienterror(connfd, method, "503", "Not implemented",
+                "Un-supported method");
     return;
   }
   read_requesthdrs(&rio);
@@ -70,10 +81,17 @@ void doit(int connfd) {
     clienterror(connfd, filename, "403", "Forbidden", "Cannot access file");
     return;
   }
-  if (is_static) {
-    serve_static(connfd, filename, sbuf.st_size);
-  } else {
-    serve_dynamic(connfd, filename, cgi_args);
+  int content = 0;
+  switch (service_type) {
+    case GET:
+      content = 1;
+    case HEAD:
+      if (is_static) {
+        serve_static(connfd, filename, sbuf.st_size, content);
+      } else {
+        serve_dynamic(connfd, filename, cgi_args);
+      }
+      break;
   }
   return;
 }
@@ -138,7 +156,7 @@ int parse_uri(char *uri, char *filename, char *cgi_args) {
 
 /* serve static content */
 /* this function only serves the first line of a static file */
-void serve_static(int connfd, char *filename, int filesz) {
+void serve_static(int connfd, char *filename, int filesz, int content) {
   char filetype[32], buf[MAXLINE];
   int n;
 
@@ -156,6 +174,11 @@ void serve_static(int connfd, char *filename, int filesz) {
   /* the end of the header */
   sprintf(buf, "\r\n");
   rio_writen(connfd, buf, strlen(buf));
+
+  /* Problem 11.11: HEAD */
+  if (!content) {
+    return;
+  }
 
   int filefd = open(filename, O_RDONLY, 0);
   /* char *filep = mmap(0, filesz, PROT_READ, MAP_PRIVATE, filefd, 0); */
@@ -179,12 +202,6 @@ void serve_dynamic(int connfd, char *filename, char *cgi_args) {
   rio_writen(connfd, buf, strlen(buf));
   sprintf(buf, "Server: Tiny Web Server\r\n");
   rio_writen(connfd, buf, strlen(buf));
-  /* the end of the header */
-  sprintf(buf, "\r\n");
-  rio_writen(connfd, buf, strlen(buf));
-
-  sprintf(buf, "Dynamic service with args: %s\r\n", cgi_args);
-  rio_writen(connfd, buf, strlen(buf));
 
   if (fork() == 0) {
     setenv("QUERY_STRING", cgi_args, 1);
@@ -197,6 +214,8 @@ void serve_dynamic(int connfd, char *filename, char *cgi_args) {
 void getfiletype(char *filename, char *filetype) {
   if (strstr(filename, ".html"))
     strcpy(filetype, "text/html");
+  else if (strstr(filename, ".css"))
+    strcpy(filetype, "text/css");
   else if (strstr(filename, ".gif"))
     strcpy(filetype, "image/gif");
   else if (strstr(filename, ".png"))
